@@ -50,30 +50,23 @@ app.delete('/api/persons/:id', (req, res, next) => {
   })
 
 app.put('/api/persons/:id', (req, res, next) => {
-  const person = {
-    name: req.body.name,
-    number: req.body.number,
-  }
+  Person.findOne({_id:req.params.id})
+    .then(foundPerson => {
+      const person = foundPerson
+      person.name = req.body.name
+      person.number = req.body.number
 
-  Person.findByIdAndUpdate(req.params.id, person, { new: true, runValidators: true })
-    .then(updatedPerson => {
-      res.json(updatedPerson)
+      person.save()
+        .then(savedPerson => res.json(savedPerson))
+        .catch(error => next(error))
     })
     .catch(error => next(error))
 })
 
 app.post('/api/persons', (req, res, next) => {
-  const body = req.body
-
-  if (!(body.name && body.number)) {
-    return res.status(400).json({ 
-      error: 'missing name or number' 
-    })
-  }
-
   const person = new Person({
-    name: body.name,
-    number: body.number
+    name: req.body.name,
+    number: req.body.number
   })
 
   person.save()
@@ -96,7 +89,9 @@ const errorHandler = (error, request, res, next) => {
     return res.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
     return res.status(400).json({ error: error.message })
-  } 
+  } else if (error.name === 'TypeError') {
+    return res.status(400).json({ error: 'User has already been deleted from server.' })
+  }
 
   next(error)
 }
