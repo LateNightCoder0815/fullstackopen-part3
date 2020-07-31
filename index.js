@@ -21,14 +21,14 @@ app.get('/api/persons', (req, res, next) => {
   Person.find({}).then(persons => {
     res.json(persons)
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 app.get('/info', (req, res, next) => {
-    Person.find({}).then(persons => {
-      res.send(`Phonebook has info for ${persons.length} people <br /><br /> ${new Date()}`)
-    })
-    .catch(error => next(error))    
+  Person.find({}).then(persons => {
+    res.send(`Phonebook has info for ${persons.length} people <br /><br /> ${new Date()}`)
+  })
+    .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
@@ -41,16 +41,16 @@ app.get('/api/persons/:id', (req, res, next) => {
       }
     })
     .catch(error => next(error))
-  })
+})
 
 app.delete('/api/persons/:id', (req, res, next) => {
-    Person.findByIdAndDelete(req.params.id)
-      .then(result => res.status(204).end())
-      .catch(error => next(error))
-  })
+  Person.findByIdAndDelete(req.params.id)
+    .then(() => res.status(204).end())
+    .catch(error => next(error))
+})
 
 app.put('/api/persons/:id', (req, res, next) => {
-  Person.findOne({_id:req.params.id})
+  Person.findOne({ _id:req.params.id })
     .then(foundPerson => {
       const person = foundPerson
       person.name = req.body.name
